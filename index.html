@@ -31,7 +31,6 @@
     <h1>HỆ THỐNG QUẢN LÝ SINH VIÊN VÀ HỌC PHẦN</h1>
     <p style="text-align:center; font-style:italic; color: #666;">Sản phẩm BTL của: Thảo Vy - Chí Bảo - Ngọc Thủy - Cẩm Tú</p>
 
-    <!-- Khu vực nhập thông tin (Phần Thảo Vy) -->
     <h2>Thêm / Sửa Sinh Viên</h2>
     <div id="student-form">
         <input type="hidden" id="edit-index">
@@ -57,14 +56,12 @@
 
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
 
-    <!-- Khu vực tìm kiếm và sắp xếp (Phần Chí Bảo & Ngọc Thủy) -->
     <h2>Danh Sách Sinh Viên</h2>
     <div class="search-box">
         <input type="text" id="searchName" placeholder="Tìm kiếm theo tên sinh viên..." oninput="searchStudent()">
         <button class="btn-success" onclick="sortStudents()">Sắp xếp GPA Giảm Dần</button>
     </div>
 
-    <!-- Bảng hiển thị thông tin sinh viên -->
     <table>
         <thead>
             <tr>
@@ -79,11 +76,136 @@
             </tr>
         </thead>
         <tbody id="student-table-body">
-            <!-- Dữ liệu tự động đổ vào đây -->
+            <!-- Dữ liệu đổ tự động -->
         </tbody>
     </table>
 </div>
 
-<script src="script.js"></script>
+<!-- ĐÃ GOM CODE JS VÀO THẺ SCRIPT DƯỚI ĐÂY -->
+<script>
+let danhSachSinhVien = [];
+
+function tinhGpaVaXepLoai(sv) {
+    sv.gpa = parseFloat((sv.diemGK * 0.4 + sv.diemCK * 0.6).toFixed(2));
+    if (sv.gpa >= 8.5) sv.xepLoai = "Xuất sắc";
+    else if (sv.gpa >= 7.0) sv.xepLoai = "Giỏi";
+    else if (sv.gpa >= 5.5) sv.xepLoai = "Khá";
+    else if (sv.gpa >= 4.0) sv.xepLoai = "Trung bình";
+    else sv.xepLoai = "Yếu";
+
+    if (sv.gpa >= 8.5) sv.diemChu = "A";
+    else if (sv.gpa >= 8.0) sv.diemChu = "B+";
+    else if (sv.gpa >= 7.0) sv.diemChu = "B";
+    else if (sv.gpa >= 6.5) sv.diemChu = "C+";
+    else if (sv.gpa >= 5.5) sv.diemChu = "C";
+    else if (sv.gpa >= 5.0) sv.diemChu = "D+";
+    else if (sv.gpa >= 4.0) sv.diemChu = "D";
+    else sv.diemChu = "F";
+}
+
+function renderTable(data = danhSachSinhVien) {
+    const tbody = document.getElementById("student-table-body");
+    tbody.innerHTML = "";
+    data.forEach((sv, index) => {
+        const row = `
+            <tr>
+                <td>${sv.maSV}</td>
+                <td>${sv.hoTen}</td>
+                <td>${sv.diemGK}</td>
+                <td>${sv.diemCK}</td>
+                <td>${sv.gpa}</td>
+                <td><strong>${sv.diemChu}</strong></td>
+                <td>${sv.xepLoai}</td>
+                <td class="actions">
+                    <button onclick="chuanBiSua(${index})">Sửa</button>
+                    <button class="btn-danger" onclick="xoaSinhVien(${index})">Xóa</button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+function saveStudent() {
+    const maSV = document.getElementById("maSV").value.trim();
+    const hoTen = document.getElementById("hoTen").value.trim();
+    const diemGK = parseFloat(document.getElementById("diemGK").value);
+    const diemCK = parseFloat(document.getElementById("diemCK").value);
+    const editIndex = document.getElementById("edit-index").value;
+
+    if (!maSV || !hoTen || isNaN(diemGK) || isNaN(diemCK)) {
+        alert("Vui lòng nhập đầy đủ thông tin hợp lệ!");
+        return;
+    }
+    if (diemGK < 0 || diemGK > 10 || diemCK < 0 || diemCK > 10) {
+        alert("Điểm phải từ 0 đến 10!");
+        return;
+    }
+
+    let sv = { maSV, hoTen, diemGK, diemCK };
+    tinhGpaVaXepLoai(sv);
+
+    if (editIndex === "") {
+        danhSachSinhVien.push(sv);
+    } else {
+        danhSachSinhVien[parseInt(editIndex)] = sv;
+        cancelEdit();
+    }
+    renderTable();
+    clearInputs();
+}
+
+function chuanBiSua(index) {
+    const sv = danhSachSinhVien[index];
+    document.getElementById("maSV").value = sv.maSV;
+    document.getElementById("hoTen").value = sv.hoTen;
+    document.getElementById("diemGK").value = sv.diemGK;
+    document.getElementById("diemCK").value = sv.diemCK;
+    document.getElementById("edit-index").value = index;
+    document.getElementById("btn-save").innerText = "Cập nhật thông tin";
+    document.getElementById("btn-cancel").style.display = "inline-block";
+}
+
+function cancelEdit() {
+    clearInputs();
+    document.getElementById("edit-index").value = "";
+    document.getElementById("btn-save").innerText = "Lưu Sinh Viên";
+    document.getElementById("btn-cancel").style.display = "none";
+}
+
+function clearInputs() {
+    document.getElementById("maSV").value = "";
+    document.getElementById("hoTen").value = "";
+    document.getElementById("diemGK").value = "";
+    document.getElementById("diemCK").value = "";
+}
+
+function searchStudent() {
+    const tuKhoa = document.getElementById("searchName").value.toLowerCase().trim();
+    const ketQua = danhSachSinhVien.filter(sv => sv.hoTen.toLowerCase().includes(tuKhoa));
+    renderTable(ketQua);
+}
+
+function xoaSinhVien(index) {
+    if (confirm("Bạn có chắc chắn muốn xóa sinh viên này?")) {
+        danhSachSinhVien.splice(index, 1);
+        renderTable();
+    }
+}
+
+function sortStudents() {
+    for (let i = 0; i < danhSachSinhVien.length - 1; i++) {
+        for (let j = i + 1; j < danhSachSinhVien.length; j++) {
+            if (danhSachSinhVien[i].gpa < danhSachSinhVien[j].gpa) {
+                let temp = danhSachSinhVien[i];
+                danhSachSinhVien[i] = danhSachSinhVien[j];
+                danhSachSinhVien[j] = temp;
+            }
+        }
+    }
+    alert("Đã sắp xếp danh sách theo GPA giảm dần!");
+    renderTable();
+}
+</script>
 </body>
 </html>
