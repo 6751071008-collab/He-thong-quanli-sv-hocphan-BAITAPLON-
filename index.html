@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống quản lý sinh viên và học phần</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; color: #333; }
+        h1, h2 { color: #007bff; text-align: center; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background-color: #0056b3; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #bd2130; }
+        .btn-success { background-color: #28a745; }
+        .btn-success:hover { background-color: #218838; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .actions { display: flex; gap: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>HỆ THỐNG QUẢN LÝ SINH VIÊN VÀ HỌC PHẦN</h1>
+    <p style="text-align:center; font-style:italic; color: #666;">Sản phẩm BTL của: Thảo Vy - Chí Bảo - Ngọc Thủy - Cẩm Tú</p>
+
+    <!-- Khu vực nhập thông tin (Phần Thảo Vy) -->
+    <h2>Thêm / Sửa Sinh Viên</h2>
+    <div id="student-form">
+        <input type="hidden" id="edit-index">
+        <div class="form-group">
+            <label for="maSV">Mã SV:</label>
+            <input type="text" id="maSV" placeholder="Nhập mã sinh viên">
+        </div>
+        <div class="form-group">
+            <label for="hoTen">Họ và Tên:</label>
+            <input type="text" id="hoTen" placeholder="Nhập họ và tên">
+        </div>
+        <div class="form-group">
+            <label for="diemGK">Điểm Giữa Kỳ:</label>
+            <input type="number" id="diemGK" min="0" max="10" step="0.1" placeholder="Từ 0 đến 10">
+        </div>
+        <div class="form-group">
+            <label for="diemCK">Điểm Cuối Kỳ:</label>
+            <input type="number" id="diemCK" min="0" max="10" step="0.1" placeholder="Từ 0 đến 10">
+        </div>
+        <button type="button" id="btn-save" onclick="saveStudent()">Lưu Sinh Viên</button>
+        <button type="button" style="display:none;" id="btn-cancel" onclick="cancelEdit()">Hủy</button>
+    </div>
+
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
+
+    <!-- Khu vực tìm kiếm và sắp xếp (Phần Chí Bảo & Ngọc Thủy) -->
+    <h2>Danh Sách Sinh Viên</h2>
+    <div class="search-box">
+        <input type="text" id="searchName" placeholder="Tìm kiếm theo tên sinh viên..." oninput="searchStudent()">
+        <button class="btn-success" onclick="sortStudents()">Sắp xếp GPA Giảm Dần</button>
+    </div>
+
+    <!-- Bảng hiển thị thông tin sinh viên -->
+    <table>
+        <thead>
+            <tr>
+                <th>Mã SV</th>
+                <th>Họ và Tên</th>
+                <th>Điểm GK</th>
+                <th>Điểm CK</th>
+                <th>GPA</th>
+                <th>Điểm Chữ</th>
+                <th>Xếp Loại</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="student-table-body">
+            <!-- Dữ liệu tự động đổ vào đây -->
+        </tbody>
+    </table>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
